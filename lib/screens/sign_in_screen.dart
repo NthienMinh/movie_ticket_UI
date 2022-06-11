@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:movie_ticket_app/models/user.dart';
 import 'package:movie_ticket_app/screens/homecine_screen.dart';
 import 'package:movie_ticket_app/screens/sign_up_screen.dart';
 import 'package:movie_ticket_app/widgets/bigtext.dart';
@@ -14,6 +15,9 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
+  String? email;
+  String? password;
+  bool check = false;
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   @override
@@ -100,7 +104,24 @@ class _SignInScreenState extends State<SignInScreen> {
                   child: const Text('Đăng nhập',style: TextStyle(
                 color: Colors.white,
               )),
-                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => HomeCineScreen())),
+                  onPressed: () {
+                    email = nameController.text;
+                    password = passwordController.text;
+                    for ( int i = 0; i < UserModel.UserList.length; i++){
+                      if (email == UserModel.UserList[i].email && password == UserModel.UserList[i].password){
+                        check = true;
+                        break;
+                      }else{
+                        check == false;
+                      }
+                    }
+                    if (check == true){
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => HomeCineScreen()));
+                      check =false;
+                    }else{
+                      _showCupertinoDialog(context);
+                    }
+                  },
                 )
             ),
           SizedBox(height: 25),
@@ -123,4 +144,32 @@ class _SignInScreenState extends State<SignInScreen> {
       ),
     );
   }
+  _dismissDialog(BuildContext context) {
+  Navigator.push(context, MaterialPageRoute(builder: (_) => SignInScreen()));
+}
+
+void _showCupertinoDialog(BuildContext context) {
+  showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: BigText(
+            text: 'Sai tên đăng nhập hoặc mật khẩu!',
+            color: Colors.black,
+            size: 15,
+          ),
+          actions: <Widget>[
+            TextButton(
+                onPressed: () {
+                  _dismissDialog(context);
+                  
+                },
+                child: BigText(
+                  text: 'Đóng',
+                  color: Colors.black,
+                )),
+          ],
+        );
+      });
+}
 }
